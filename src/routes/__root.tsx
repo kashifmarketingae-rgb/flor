@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -28,36 +29,36 @@ const ORG_JSON_LD = {
 
 function NotFoundComponent() {
   return (
-    <>
-      
-      <main className="container-page grid min-h-[60vh] place-items-center py-20 text-center">
-        <div className="max-w-md">
-          <div className="mx-auto mb-6 grid h-24 w-24 place-items-center rounded-3xl bg-accent/20 text-4xl font-bold text-primary">
-            404
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">الصفحة غير موجودة</h1>
-          <p className="mt-3 text-muted-foreground">
-            الرابط الذي فتحته غير صحيح أو تم نقله. يمكنك العودة إلى الصفحة الرئيسية والبدء من جديد.
-          </p>
-          <Link
-            to="/"
-            className="mt-8 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:shadow-elegant"
-          >
-            العودة للصفحة الرئيسية
-          </Link>
+    <main className="container-page grid min-h-[60vh] place-items-center py-20 text-center">
+      <div className="max-w-md">
+        <div className="mx-auto mb-6 grid h-24 w-24 place-items-center rounded-3xl bg-accent/20 text-4xl font-bold text-primary">
+          404
         </div>
-      </main>
-      
-    </>
+        <h1 className="text-3xl font-bold text-foreground">الصفحة غير موجودة</h1>
+        <p className="mt-3 text-muted-foreground">
+          الرابط الذي فتحته غير صحيح أو تم نقله. يمكنك العودة إلى الصفحة الرئيسية والبدء من جديد.
+        </p>
+        <Link
+          to="/"
+          className="mt-8 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-soft hover:shadow-elegant"
+        >
+          العودة للصفحة الرئيسية
+        </Link>
+      </div>
+    </main>
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
+
+  // error ممكن يكون أي نوع، فنحوّله لـ Error قبل الاستخدام
+  const err = error instanceof Error ? error : new Error(String(error));
+
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+    console.error(err);
+    reportLovableError(err, { boundary: "tanstack_root_error_component" });
+  }, [err]);
 
   return (
     <main className="container-page grid min-h-[60vh] place-items-center py-20 text-center">
@@ -76,7 +77,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             حاول مجددًا
           </button>
-          <a href="/" className="rounded-full border border-input bg-background px-5 py-2.5 text-sm font-semibold">
+          <a
+            href="/"
+            className="rounded-full border border-input bg-background px-5 py-2.5 text-sm font-semibold"
+          >
             الصفحة الرئيسية
           </a>
         </div>
@@ -104,14 +108,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "منصة الشكاوى المستقلة | توثيق شكاوى المستهلكين في الإمارات" },
       { name: "twitter:title", content: "منصة الشكاوى المستقلة | توثيق شكاوى المستهلكين في الإمارات" },
-      { property: "og:description", content: "منصة خاصة ومستقلة تساعد المستهلكين في دولة الإمارات على توثيق شكاواهم تجاه الشركات الخاصة بشكل بسيط وسريع. غير تابعة لأي جهة حكومية." },
-      { name: "twitter:description", content: "منصة خاصة ومستقلة تساعد المستهلكين في دولة الإمارات على توثيق شكاواهم تجاه الشركات الخاصة بشكل بسيط وسريع. غير تابعة لأي جهة حكومية." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/20faf45e-3ae3-44db-b298-b400eb4e72c6" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/20faf45e-3ae3-44db-b298-b400eb4e72c6" },
+      {
+        property: "og:description",
+        content:
+          "منصة خاصة ومستقلة تساعد المستهلكين في دولة الإمارات على توثيق شكاواهم تجاه الشركات الخاصة بشكل بسيط وسريع. غير تابعة لأي جهة حكومية.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "منصة خاصة ومستقلة تساعد المستهلكين في دولة الإمارات على توثيق شكاواهم تجاه الشركات الخاصة بشكل بسيط وسريع. غير تابعة لأي جهة حكومية.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/20faf45e-3ae3-44db-b298-b400eb4e72c6",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/20faf45e-3ae3-44db-b298-b400eb4e72c6",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/kk.png", type: "image/svg+xml" },
+      { rel: "icon", href: "/kk.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -119,7 +139,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Tajawal:wght@500;700;800&display=swap",
       },
     ],
-    // إضافة الـ Scripts الخاصة بـ Head مثل Schema Org هنا بشكل صحيح
+    // Schema Org (بيانات منظمة للمحركات)
     scripts: [
       {
         type: "application/ld+json",

@@ -115,7 +115,7 @@ async function getClientNetInfo(): Promise<{
 }
 
 export const submitComplaint = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => inputSchema.parse(data))
+  .validator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }) => {
     const { device, browser, os } = parseUA(data.userAgent);
     
